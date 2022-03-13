@@ -5,11 +5,19 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Slider with two selector</title>
 
     <style>
+        :root {
+            --samoPink: #e54129
+        }
+
         [slider] {
             position: relative;
+            height: 25px;
+        }
+
+        [slider] * {
+            transition: all 0.4s;
         }
 
         [slider]>div {
@@ -18,63 +26,52 @@
             right: 0;
         }
 
-        [slider]>div>[inverse-left] {
+        [slider]>div>[inverse] {
             position: absolute;
-            left: 0;
-            height: 14px;
+            height: 10px;
             border-radius: 10px;
             background-color: #CCC;
             margin: 0 7px;
         }
 
-        [slider]>div>[inverse-right] {
-            position: absolute;
+        [slider]>div>[inverse]#inverse-left {
+            left: 0;
+        }
+
+        [slider]>div>[inverse]#inverse-right {
             right: 0;
-            height: 14px;
-            border-radius: 10px;
-            background-color: #CCC;
-            margin: 0 7px;
         }
 
         [slider]>div>[range] {
             position: absolute;
-            left: 0;
-            height: 14px;
-            border-radius: 14px;
-            background-color: #1ABC9C;
+            height: 10px;
+            background-color: var(--samoPink);
         }
 
         [slider]>div>[thumb] {
             position: absolute;
-            top: -7px;
             z-index: 2;
-            height: 28px;
-            width: 28px;
-            text-align: left;
-            margin-left: -11px;
-            cursor: pointer;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
-            background-color: #FFF;
+            height: 23px;
+            width: 23px;
+            background-color: var(--samoPink);
             border-radius: 50%;
             outline: none;
+            transform: translate(-50%, -25%);
         }
 
         [slider]>div>[sign] {
             opacity: 0;
             position: absolute;
-            margin-left: -11px;
-            top: -39px;
             z-index: 3;
-            background-color: #1ABC9C;
+            background-color: var(--samoPink);
             color: #fff;
             width: 28px;
             height: 28px;
-            border-radius: 28px;
-            -webkit-border-radius: 28px;
-            align-items: center;
-            -webkit-justify-content: center;
+            border-radius: 50%;
+            display: flex;
             justify-content: center;
-            text-align: center;
+            align-items: center;
+            transform: translate(-50%, -150%);
         }
 
         [slider]>div>[sign]:after {
@@ -87,13 +84,12 @@
             border-right: 14px solid transparent;
             border-top-width: 16px;
             border-top-style: solid;
-            border-top-color: #1ABC9C;
+            border-top-color: var(--samoPink);
         }
 
         [slider]>div>[sign]>span {
             font-size: 12px;
             font-weight: 700;
-            line-height: 28px;
         }
 
         [slider]:hover>div>[sign] {
@@ -176,10 +172,27 @@
 
 <body>
     <section style="margin-top: 50px;">
+        <div slider id="slider-distance" style="height: 150px;">
+            <div id="slider-stilized">
+                <div id="inverse-left" inverse style="width:80%;"></div>
+                <div id="inverse-right" inverse style="width:80%;"></div>
+
+                <div range style="left:calc((100% / 6) * 2); right:calc((100% / 6) * 2);"></div>
+
+                <span id="thumb-left" thumb style="left:calc((100% / 6) * 2);"></span>
+                <span id="thumb-right" thumb style="left:calc((100% / 6) * 4);"></span>
+
+                <div id="sign-left" sign style="left:calc((100% / 6) * 2);"> <span id="value">2</span> </div>
+                <div id="sign-right" sign style="left:calc((100% / 6) * 4);"> <span id="value">4</span> </div>
+            </div>
+            <input type="range" tabindex="0" value="2" max="6" min="0" step="1" id="firstSlide" />
+            <input type="range" tabindex="0" value="4" max="6" min="0" step="1" id="secondSlide" />
+        </div>
+
         <div slider id="slider-distance">
             <div id="slider-stilized">
-                <div inverse-left style="width:80%;"></div>
-                <div inverse-right style="width:80%;"></div>
+                <div id="inverse-left" inverse style="width:80%;"></div>
+                <div id="inverse-right" inverse style="width:80%;"></div>
 
                 <div range style="left:calc((100% / 6) * 2); right:calc((100% / 6) * 2);"></div>
 
@@ -195,17 +208,17 @@
     </section>
 
     <script>
-        const sliderDistance = document.querySelector('#slider-distance')
-            , sliderStilizedNodes = document.querySelector('#slider-stilized').childNodes
-            , range = document.querySelector('[range]')
-            , inverseLeft = document.querySelector('[inverse-left]')
-            , inverseRight = document.querySelector('[inverse-right]')
-            , thumbLeft = document.querySelector('#thumb-left')
-            , thumbRight = document.querySelector('#thumb-right')
-            , signLeft = document.querySelector('#sign-left')
-            , signRight = document.querySelector('#sign-right');
-
         const runSlide = (_this, type) => {
+            const sliderDistance = _this.parentElement
+                , sliderStilizedNodes = sliderDistance.querySelector('#slider-stilized').childNodes
+                , range = sliderDistance.querySelector('[range]')
+                , inverseLeft = sliderDistance.querySelector('#inverse-left')
+                , inverseRight = sliderDistance.querySelector('#inverse-right')
+                , thumbLeft = sliderDistance.querySelector('#thumb-left')
+                , thumbRight = sliderDistance.querySelector('#thumb-right')
+                , signLeft = sliderDistance.querySelector('#sign-left')
+                , signRight = sliderDistance.querySelector('#sign-right');
+
             _this.value = type == "firstSlide" ?
                 Math.min(_this.value, secondSlide.value - 1) :
                 Math.max(_this.value, firstSlide.value - (-1));
@@ -217,13 +230,13 @@
                 var inverse = inverseLeft
                     , thumb = thumbLeft
                     , sign = signLeft;
-                
+
                 range.style.left = value + '%';
             } else {
                 var inverse = inverseRight
                     , thumb = thumbRight
                     , sign = signRight;
-                
+
                 secondValue = (100 - value);
                 range.style.right = secondValue + '%';
             }
@@ -232,18 +245,25 @@
             thumb.style.left = value + "%";
             sign.style.left = value + "%";
             sign.querySelector('span').innerHTML = _this.value;
+
+            return _this.value
         }
 
-        
-        const firstSlide = document.querySelector('#firstSlide')
-            , secondSlide = document.querySelector('#secondSlide');
+        const allSliders = document.querySelectorAll('#slider-distance');
 
-        firstSlide.addEventListener('input', (_this) => {
-            runSlide(_this.target, 'firstSlide')
-        });
+        allSliders.forEach(slider => {
+            const firstSlide = slider.querySelector('#firstSlide')
+                , secondSlide = slider.querySelector('#secondSlide');
 
-        secondSlide.addEventListener('input', (_this) => {
-            runSlide(_this.target, 'secondSlide')
+            firstSlide.addEventListener('input', (e) => {
+                var value = runSlide(e.target, 'firstSlide');
+                console.log(value);
+            });
+
+            secondSlide.addEventListener('input', (e) => {
+                var value = runSlide(e.target, 'secondSlide');
+                console.log(value);
+            })
         });
     </script>
 </body>
