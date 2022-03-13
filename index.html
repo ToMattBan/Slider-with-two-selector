@@ -175,52 +175,77 @@
 </head>
 
 <body>
-
-    <script>
-        const firstSlide = (_this) => {
-            _this.value = Math.min(_this.value, _this.parentNode.childNodes[5].value - 1);
-            var value = (100 / (parseInt(_this.max) - parseInt(_this.min))) * parseInt(_this.value) - (100 / (parseInt(_this.max) - parseInt(_this.min))) * parseInt(_this.min);
-            var children = _this.parentNode.childNodes[1].childNodes;
-            children[1].style.width = value + '%';
-            children[5].style.left = value + '%';
-            children[7].style.left = value + '%'; children[11].style.left = value + '%';
-            children[11].childNodes[1].innerHTML = _this.value;
-        }
-
-        const secondSlide = (_this) => {
-            _this.value = Math.max(_this.value, _this.parentNode.childNodes[3].value - (-1));
-            var value = (100 / (parseInt(_this.max) - parseInt(_this.min))) * parseInt(_this.value) - (100 / (parseInt(_this.max) - parseInt(_this.min))) * parseInt(_this.min);
-            var children = _this.parentNode.childNodes[1].childNodes;
-            children[3].style.width = (100 - value) + '%';
-            children[5].style.right = (100 - value) + '%';
-            children[9].style.left = value + '%'; children[13].style.left = value + '%';
-            children[13].childNodes[1].innerHTML = _this.value;
-        }
-    </script>
-
-
     <section style="margin-top: 50px;">
         <div slider id="slider-distance">
-            <div>
-                <div inverse-left style="width:70%;"></div>
-                <div inverse-right style="width:70%;"></div>
-                <div range style="left:30%;right:40%;"></div>
-                <span thumb style="left:30%;"></span>
-                <span thumb style="left:60%;"></span>
-                <div sign style="left:30%;">
-                    <span id="value">30</span>
-                </div>
-                <div sign style="left:60%;">
-                    <span id="value">60</span>
-                </div>
+            <div id="slider-stilized">
+                <div inverse-left style="width:80%;"></div>
+                <div inverse-right style="width:80%;"></div>
+
+                <div range style="left:calc((100% / 6) * 2); right:calc((100% / 6) * 2);"></div>
+
+                <span id="thumb-left" thumb style="left:calc((100% / 6) * 2);"></span>
+                <span id="thumb-right" thumb style="left:calc((100% / 6) * 4);"></span>
+
+                <div id="sign-left" sign style="left:calc((100% / 6) * 2);"> <span id="value">2</span> </div>
+                <div id="sign-right" sign style="left:calc((100% / 6) * 4);"> <span id="value">4</span> </div>
             </div>
-
-
-            <input type="range" tabindex="0" value="30" max="100" min="0" step="1" oninput="firstSlide(this)" />
-
-            <input type="range" tabindex="0" value="60" max="100" min="0" step="1" oninput="secondSlide(this)" />
+            <input type="range" tabindex="0" value="2" max="6" min="0" step="1" id="firstSlide" />
+            <input type="range" tabindex="0" value="4" max="6" min="0" step="1" id="secondSlide" />
         </div>
     </section>
+
+    <script>
+        const sliderDistance = document.querySelector('#slider-distance')
+            , sliderStilizedNodes = document.querySelector('#slider-stilized').childNodes
+            , range = document.querySelector('[range]')
+            , inverseLeft = document.querySelector('[inverse-left]')
+            , inverseRight = document.querySelector('[inverse-right]')
+            , thumbLeft = document.querySelector('#thumb-left')
+            , thumbRight = document.querySelector('#thumb-right')
+            , signLeft = document.querySelector('#sign-left')
+            , signRight = document.querySelector('#sign-right');
+
+        const runSlide = (_this, type) => {
+            _this.value = type == "firstSlide" ?
+                Math.min(_this.value, secondSlide.value - 1) :
+                Math.max(_this.value, firstSlide.value - (-1));
+
+            var value = (100 / (parseInt(_this.max) - parseInt(_this.min))) * parseInt(_this.value) - (100 / (parseInt(_this.max) - parseInt(_this.min))) * parseInt(_this.min);
+
+            var secondValue = value;
+            if (type == "firstSlide") {
+                var inverse = inverseLeft
+                    , thumb = thumbLeft
+                    , sign = signLeft;
+                
+                range.style.left = value + '%';
+            } else {
+                var inverse = inverseRight
+                    , thumb = thumbRight
+                    , sign = signRight;
+                
+                secondValue = (100 - value);
+                range.style.right = secondValue + '%';
+            }
+
+            inverse.style.width = secondValue + "%";
+            thumb.style.left = value + "%";
+            sign.style.left = value + "%";
+            sign.querySelector('span').innerHTML = _this.value;
+        }
+
+        
+        const firstSlide = document.querySelector('#firstSlide')
+            , secondSlide = document.querySelector('#secondSlide');
+
+        firstSlide.addEventListener('input', (_this) => {
+            runSlide(_this.target, 'firstSlide')
+        });
+
+        secondSlide.addEventListener('input', (_this) => {
+            runSlide(_this.target, 'secondSlide')
+        });
+    </script>
 </body>
 
 </html>
